@@ -1,14 +1,54 @@
 # LeSort
-- Unixのlsコマンドを再実装したCLIツールです。
+- Unixのlsコマンドを再実装したCLIツール
 
 # Overview
-- ファイルサイズを読み取り可能にする。
-- 作成日時に応じて印をつける。
-- ソート順を用途に応じて選択可能とする。
+- フォルダ内のファイル一覧を解析し、拡張子や命名規則に基づいて分類の妥当性を評価するツール
+- ファイルの種類や命名パターンから、整理状態が適切かどうかをスコアとして可視化する
+- ディレクトリ構成の改善や整理の指針を提供することを目的とする
 
 # Usage
-- mada
+
+File organization analyzer and scoring tool
+
+Usage: lesort [OPTIONS] [PATH]
+
+Arguments:
+[PATH]
+Target directory to analyze (default: current directory)
+
+Options:
+-a, --all
+Include hidden files in analysis
+
+-d, --detail
+Show detailed classification of files
+
+-s, --score
+Display organization score
+
+-h, --help
+Print this help message
+
+-V, --version
+Print version information
+
+Description:
+LeSort analyzes files in a directory based on their extensions and naming patterns.
+It evaluates whether the directory structure is well-organized and outputs a score.
+
+Examples:
+lesort
+lesort ./src
+lesort -a -s
 
 # Installation
 
+# Lisence
+- MIT Lisense
+
+# Author
+- Naito Shun
+
 # About
+
+
