@@ -1,5 +1,9 @@
 # LeSort
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+![Version](https://img.shields.io/badge/version-0.1.0-green.svg)
+
 [![Coverage Status](https://coveralls.io/repos/github/Nattoinf/LeSort/badge.svg?branch=main)](https://coveralls.io/github/Nattoinf/LeSort?branch=main)
 
 ![Build Status](https://github.com/Nattoinf/LeSort/actions/workflows/build.yaml/badge.svg)
