@@ -1,3 +1,8 @@
+[![Coverage Status](https://coveralls.io/repos/github/Nattoinf/LeSort/badge.svg?branch=main)](https://coveralls.io/github/Nattoinf/LeSort?branch=main)
+
+![Build Status](https://github.com/Nattoinf/LeSort/actions/workflows/build.yaml/badge.svg)
+
+
 # LeSort
 - Unixのlsコマンドを再実装したCLIツール
 
