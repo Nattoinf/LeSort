@@ -172,13 +172,26 @@ fn print_results(
     detail: bool,
     show_score: bool,
 ) {
-    // Display file statistics
+    print_file_statistics(file_count, extension_counts);
+    print_extension_breakdown(file_count, extension_counts);
+
+    if detail {
+        print_detailed_file_list(files);
+    }
+
+    if show_score {
+        print_organization_score(file_count, extension_counts);
+    }
+}
+
+fn print_file_statistics(file_count: usize, extension_counts: &HashMap<String, usize>) {
     println!("📊 File Statistics:");
     println!("  Total files: {}", file_count);
     println!("  File types: {}", extension_counts.len());
     println!();
+}
 
-    // Display extension breakdown
+fn print_extension_breakdown(file_count: usize, extension_counts: &HashMap<String, usize>) {
     println!("📁 Extension Breakdown:");
     let mut extensions: Vec<_> = extension_counts.iter().collect();
     extensions.sort_by_key(|&(_, count)| std::cmp::Reverse(*count));
@@ -188,29 +201,27 @@ fn print_results(
         println!("  {}: {} files ({:.1}%)", ext, count, percentage);
     }
     println!();
+}
 
-    // Display detailed file list if requested
-    if detail {
-        println!("📝 Detailed File List:");
-        files.sort();
+fn print_detailed_file_list(files: &mut Vec<(String, String)>) {
+    println!("📝 Detailed File List:");
+    files.sort();
 
-        for (name, ext) in files.iter() {
-            println!("  {} [{}]", name, ext);
-        }
-
-        println!();
+    for (name, ext) in files.iter() {
+        println!("  {} [{}]", name, ext);
     }
 
-    // Calculate and display organization score if requested
-    if show_score {
-        let score = calculate_organization_score(
-            file_count,
-            extension_counts.len(),
-        );
+    println!();
+}
 
-        println!("📈 Organization Score: {:.2}%", score);
-        println!("{}", interpret_score(score));
-    }
+fn print_organization_score(file_count: usize, extension_counts: &HashMap<String, usize>) {
+    let score = calculate_organization_score(
+        file_count,
+        extension_counts.len(),
+    );
+
+    println!("📈 Organization Score: {:.2}%", score);
+    println!("{}", interpret_score(score));
 }
 
 fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
