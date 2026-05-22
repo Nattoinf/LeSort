@@ -26,6 +26,12 @@ struct Args {
     score: bool,
 }
 
+struct AnalysisResult {
+    file_count: usize,
+    extension_counts: HashMap<String, usize>,
+    files: Vec<(String, String)>,
+}
+
 fn main() {
     let args = Args::parse();
 
@@ -50,6 +56,20 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
 
     println!("Analyzing directory: {}\n", dir_path.display());
 
+    let mut analysis_result = collect_files(dir_path, include_all)?;
+
+    print_results(
+        analysis_result.file_count,
+        &analysis_result.extension_counts,
+        &mut analysis_result.files,
+        detail,
+        show_score,
+    );
+
+    Ok(())
+}
+
+fn collect_files(dir_path: &Path, include_all: bool) -> Result<AnalysisResult, String> {
     let mut file_count = 0;
     let mut extension_counts: HashMap<String, usize> = HashMap::new();
     let mut files: Vec<(String, String)> = Vec::new();
@@ -58,36 +78,100 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
         Ok(entries) => {
             for entry in entries.flatten() {
                 let file_path = entry.path();
-                let file_name = file_path.file_name().unwrap_or_default().to_string_lossy();
 
-                // Skip hidden files if not included
-                if !include_all && file_name.starts_with('.') {
-                    continue;
-                }
-
-                if file_path.is_file() {
-                    file_count += 1;
-
-                    let extension = file_path
-                        .extension()
-                        .unwrap_or_default()
-                        .to_string_lossy()
-                        .to_string();
-
-                    let ext = if extension.is_empty() {
-                        "(no extension)".to_string()
-                    } else {
-                        extension.clone()
-                    };
-
-                    *extension_counts.entry(ext.clone()).or_insert(0) += 1;
-                    files.push((file_name.to_string(), ext));
-                }
+                process_file(
+                    &file_path,
+                    include_all,
+                    &mut file_count,
+                    &mut extension_counts,
+                    &mut files,
+                );
             }
         }
         Err(e) => return Err(format!("Failed to read directory: {}", e)),
     }
 
+    Ok(AnalysisResult {
+        file_count,
+        extension_counts,
+        files,
+    })
+}
+
+fn get_extension(file_path: &Path) -> String {
+    let extension = file_path
+        .extension()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+
+    if extension.is_empty() {
+        "(no extension)".to_string()
+    } else {
+        extension
+    }
+}
+
+fn is_hidden(file_name: &str) -> bool {
+    file_name.starts_with('.')
+}
+
+fn update_statistics(
+    file_name: String,
+    ext: String,
+    file_count: &mut usize,
+    extension_counts: &mut HashMap<String, usize>,
+    files: &mut Vec<(String, String)>,
+) {
+    *file_count += 1;
+
+    *extension_counts
+        .entry(ext.clone())
+        .or_insert(0) += 1;
+
+    files.push((file_name, ext));
+}
+
+fn process_file(
+    file_path: &Path,
+    include_all: bool,
+    file_count: &mut usize,
+    extension_counts: &mut HashMap<String, usize>,
+    files: &mut Vec<(String, String)>,
+) {
+    let file_name = file_path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+
+    // hidden file skip
+    if !include_all && is_hidden(&file_name) {
+        return;
+    }
+
+    if !file_path.is_file() {
+        return;
+    }
+
+    let ext = get_extension(file_path);
+
+    update_statistics(
+        file_name,
+        ext,
+        file_count,
+        extension_counts,
+        files,
+    );
+}
+
+fn print_results(
+    file_count: usize,
+    extension_counts: &HashMap<String, usize>,
+    files: &mut Vec<(String, String)>,
+    detail: bool,
+    show_score: bool,
+) {
     // Display file statistics
     println!("📊 File Statistics:");
     println!("  Total files: {}", file_count);
@@ -109,20 +193,24 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
     if detail {
         println!("📝 Detailed File List:");
         files.sort();
-        for (name, ext) in files {
+
+        for (name, ext) in files.iter() {
             println!("  {} [{}]", name, ext);
         }
+
         println!();
     }
 
     // Calculate and display organization score if requested
     if show_score {
-        let score = calculate_organization_score(file_count, extension_counts.len());
+        let score = calculate_organization_score(
+            file_count,
+            extension_counts.len(),
+        );
+
         println!("📈 Organization Score: {:.2}%", score);
         println!("{}", interpret_score(score));
     }
-
-    Ok(())
 }
 
 fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
