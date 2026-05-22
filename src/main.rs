@@ -127,13 +127,28 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
 
 fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
     if file_count == 0 {
-        return 0.0;
+        return 100.0;
     }
 
-    // Simple scoring: Lower diversity is better (fewer file types)
-    // Score ranges from 0-100
+    // Base score starts at 100
+    let mut score = 100.0;
+
+    // 1. ファイル数による減点（ファイルが多いほど減点が増える）
+    // ロジスティック関数を使用してスムーズな減衰
+    let file_penalty = (file_count as f64 / (1.0 + file_count as f64)) * 30.0;
+    score -= file_penalty;
+
+    // 2. 拡張子の種類による減点（増加するたびに重みが増大）
+    // 二次関数を使用して加速的に減点を増やす
+    let type_penalty = (type_count as f64).powi(2) * 0.3;
+    score -= type_penalty;
+
+    // 3. 拡張子の多様性による減点（理想的な比率は1ファイルあたり1種類未満）
     let diversity_ratio = type_count as f64 / file_count as f64;
-    let score = 100.0 - (diversity_ratio * 50.0);
+    let diversity_penalty = diversity_ratio * 20.0;
+    score -= diversity_penalty;
+
+    // スコアを0-100の範囲に正規化
     score.max(0.0).min(100.0)
 }
 
