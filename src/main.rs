@@ -43,6 +43,13 @@ fn main() {
     }
 }
 
+/// Analyzes a directory and displays file organization statistics and scores.
+///
+/// # Arguments
+/// * `path` - Directory path to analyze
+/// * `include_all` - Whether to include hidden files
+/// * `detail` - Whether to show detailed file list
+/// * `show_score` - Whether to display organization score
 fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bool) -> Result<(), String> {
     let dir_path = Path::new(path);
 
@@ -69,6 +76,10 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
     Ok(())
 }
 
+/// Collects file information from a directory.
+///
+/// Returns file count, extension statistics, and file list details.
+/// Skips hidden files unless include_all is true.
 fn collect_files(dir_path: &Path, include_all: bool) -> Result<AnalysisResult, String> {
     let mut file_count = 0;
     let mut extension_counts: HashMap<String, usize> = HashMap::new();
@@ -98,6 +109,9 @@ fn collect_files(dir_path: &Path, include_all: bool) -> Result<AnalysisResult, S
     })
 }
 
+/// Extracts the file extension from a file path.
+///
+/// Returns "(no extension)" if the file has no extension.
 fn get_extension(file_path: &Path) -> String {
     let extension = file_path
         .extension()
@@ -112,10 +126,14 @@ fn get_extension(file_path: &Path) -> String {
     }
 }
 
+/// Checks if a filename is hidden (starts with a dot).
 fn is_hidden(file_name: &str) -> bool {
     file_name.starts_with('.')
 }
 
+/// Updates file statistics with information about a new file.
+///
+/// Increments file count, adds extension to counts map, and adds file to list.
 fn update_statistics(
     file_name: String,
     ext: String,
@@ -132,6 +150,9 @@ fn update_statistics(
     files.push((file_name, ext));
 }
 
+/// Processes a single file for analysis.
+///
+/// Skips hidden files and directories. Updates statistics for valid files.
 fn process_file(
     file_path: &Path,
     include_all: bool,
@@ -145,7 +166,6 @@ fn process_file(
         .to_string_lossy()
         .to_string();
 
-    // hidden file skip
     if !include_all && is_hidden(&file_name) {
         return;
     }
@@ -165,6 +185,10 @@ fn process_file(
     );
 }
 
+/// Displays analysis results with optional detailed and score information.
+///
+/// Always shows file statistics and extension breakdown.
+/// Conditionally shows detailed file list and organization score.
 fn print_results(
     file_count: usize,
     extension_counts: &HashMap<String, usize>,
@@ -184,6 +208,7 @@ fn print_results(
     }
 }
 
+/// Displays file count and file type statistics.
 fn print_file_statistics(file_count: usize, extension_counts: &HashMap<String, usize>) {
     println!("📊 File Statistics:");
     println!("  Total files: {}", file_count);
@@ -191,6 +216,9 @@ fn print_file_statistics(file_count: usize, extension_counts: &HashMap<String, u
     println!();
 }
 
+/// Displays extension breakdown sorted by file count in descending order.
+///
+/// Shows each extension with its file count and percentage.
 fn print_extension_breakdown(file_count: usize, extension_counts: &HashMap<String, usize>) {
     println!("📁 Extension Breakdown:");
     let mut extensions: Vec<_> = extension_counts.iter().collect();
@@ -203,6 +231,9 @@ fn print_extension_breakdown(file_count: usize, extension_counts: &HashMap<Strin
     println!();
 }
 
+/// Displays a detailed list of all files sorted alphabetically.
+///
+/// Format: filename [extension]
 fn print_detailed_file_list(files: &mut Vec<(String, String)>) {
     println!("📝 Detailed File List:");
     files.sort();
@@ -214,6 +245,12 @@ fn print_detailed_file_list(files: &mut Vec<(String, String)>) {
     println!();
 }
 
+/// Calculates and displays the organization score.
+///
+/// Score is computed using three penalty factors:
+/// 1. File count penalty (max 30 points)
+/// 2. Extension type penalty (quadratic increase)
+/// 3. Diversity penalty (max 20 points)
 fn print_organization_score(file_count: usize, extension_counts: &HashMap<String, usize>) {
     let score = calculate_organization_score(
         file_count,
@@ -224,33 +261,40 @@ fn print_organization_score(file_count: usize, extension_counts: &HashMap<String
     println!("{}", interpret_score(score));
 }
 
+/// Calculates the organization score based on file count and extension diversity.
+///
+/// Formula:
+/// - Base score: 100
+/// - File penalty: (file_count / (1 + file_count)) × 30
+/// - Type penalty: (type_count)² × 0.3
+/// - Diversity penalty: (type_count / file_count) × 20
+/// - Final score: 100 - file_penalty - type_penalty - diversity_penalty (clamped to 0-100)
 fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
     if file_count == 0 {
         return 100.0;
     }
 
-    // Base score starts at 100
     let mut score = 100.0;
 
-    // 1. ファイル数による減点（ファイルが多いほど減点が増える）
-    // ロジスティック関数を使用してスムーズな減衰
     let file_penalty = (file_count as f64 / (1.0 + file_count as f64)) * 30.0;
     score -= file_penalty;
 
-    // 2. 拡張子の種類による減点（増加するたびに重みが増大）
-    // 二次関数を使用して加速的に減点を増やす
     let type_penalty = (type_count as f64).powi(2) * 0.3;
     score -= type_penalty;
 
-    // 3. 拡張子の多様性による減点（理想的な比率は1ファイルあたり1種類未満）
     let diversity_ratio = type_count as f64 / file_count as f64;
     let diversity_penalty = diversity_ratio * 20.0;
     score -= diversity_penalty;
 
-    // スコアを0-100の範囲に正規化
     score.max(0.0).min(100.0)
 }
 
+/// Interprets the organization score and returns a descriptive message.
+///
+/// - 80-100%: Excellent organization
+/// - 60-79%: Good organization
+/// - 40-59%: Fair organization (could be improved)
+/// - 0-39%: Poor organization (needs reorganizing)
 fn interpret_score(score: f64) -> String {
     if score >= 80.0 {
         "✅ Excellent organization!".to_string()
