@@ -80,7 +80,7 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
 ///
 /// Returns file count, extension statistics, and file list details.
 /// Skips hidden files unless include_all is true.
-fn collect_files(dir_path: &Path, include_all: bool) -> Result<AnalysisResult, String> {
+pub fn collect_files(dir_path: &Path, include_all: bool) -> Result<AnalysisResult, String> {
     let mut file_count = 0;
     let mut extension_counts: HashMap<String, usize> = HashMap::new();
     let mut files: Vec<(String, String)> = Vec::new();
@@ -112,7 +112,7 @@ fn collect_files(dir_path: &Path, include_all: bool) -> Result<AnalysisResult, S
 /// Extracts the file extension from a file path.
 ///
 /// Returns "(no extension)" if the file has no extension.
-fn get_extension(file_path: &Path) -> String {
+pub fn get_extension(file_path: &Path) -> String {
     let extension = file_path
         .extension()
         .unwrap_or_default()
@@ -127,7 +127,7 @@ fn get_extension(file_path: &Path) -> String {
 }
 
 /// Checks if a filename is hidden (starts with a dot).
-fn is_hidden(file_name: &str) -> bool {
+pub fn is_hidden(file_name: &str) -> bool {
     file_name.starts_with('.')
 }
 
@@ -269,7 +269,7 @@ fn print_organization_score(file_count: usize, extension_counts: &HashMap<String
 /// - Type penalty: (type_count)² × 0.3
 /// - Diversity penalty: (type_count / file_count) × 20
 /// - Final score: 100 - file_penalty - type_penalty - diversity_penalty (clamped to 0-100)
-fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
+pub fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
     if file_count == 0 {
         return 100.0;
     }
@@ -295,7 +295,7 @@ fn calculate_organization_score(file_count: usize, type_count: usize) -> f64 {
 /// - 60-79%: Good organization
 /// - 40-59%: Fair organization (could be improved)
 /// - 0-39%: Poor organization (needs reorganizing)
-fn interpret_score(score: f64) -> String {
+pub fn interpret_score(score: f64) -> String {
     if score >= 80.0 {
         "✅ Excellent organization!".to_string()
     } else if score >= 60.0 {
@@ -304,5 +304,116 @@ fn interpret_score(score: f64) -> String {
         "⚠️  Fair organization. Could be improved.".to_string()
     } else {
         "❌ Poor organization. Consider reorganizing.".to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_extension_with_extension() {
+        let path = Path::new("test.txt");
+        assert_eq!(get_extension(path), "txt");
+    }
+
+    #[test]
+    fn test_get_extension_without_extension() {
+        let path = Path::new("README");
+        assert_eq!(get_extension(path), "(no extension)");
+    }
+
+    #[test]
+    fn test_get_extension_multiple_dots() {
+        let path = Path::new("archive.tar.gz");
+        assert_eq!(get_extension(path), "gz");
+    }
+
+    #[test]
+    fn test_is_hidden_with_dot() {
+        assert!(is_hidden(".hidden"));
+    }
+
+    #[test]
+    fn test_is_hidden_without_dot() {
+        assert!(!is_hidden("visible"));
+    }
+
+    #[test]
+    fn test_is_hidden_dot_only() {
+        assert!(is_hidden("."));
+    }
+
+    #[test]
+    fn test_calculate_organization_score_empty_directory() {
+        let score = calculate_organization_score(0, 0);
+        assert_eq!(score, 100.0);
+    }
+
+    #[test]
+    fn test_calculate_organization_score_single_file_single_type() {
+        let score = calculate_organization_score(1, 1);
+        assert!(score > 0.0 && score < 100.0);
+    }
+
+    #[test]
+    fn test_calculate_organization_score_many_files_many_types() {
+        let score = calculate_organization_score(213, 14);
+        assert!(score < 20.0);
+    }
+
+    #[test]
+    fn test_calculate_organization_score_range() {
+        let score = calculate_organization_score(50, 5);
+        assert!(score >= 0.0 && score <= 100.0);
+    }
+
+    #[test]
+    fn test_interpret_score_excellent() {
+        let result = interpret_score(85.0);
+        assert!(result.contains("✅ Excellent"));
+    }
+
+    #[test]
+    fn test_interpret_score_good() {
+        let result = interpret_score(70.0);
+        assert!(result.contains("👍 Good"));
+    }
+
+    #[test]
+    fn test_interpret_score_fair() {
+        let result = interpret_score(50.0);
+        assert!(result.contains("⚠️"));
+    }
+
+    #[test]
+    fn test_interpret_score_poor() {
+        let result = interpret_score(20.0);
+        assert!(result.contains("❌ Poor"));
+    }
+
+    #[test]
+    fn test_calculate_organization_score_boundary_80() {
+        let score = calculate_organization_score(50, 1);
+        assert!(score >= 80.0);
+    }
+
+    #[test]
+    fn test_calculate_organization_score_boundary_60() {
+        let score = calculate_organization_score(100, 8);
+        assert!(score >= 60.0 && score < 80.0);
+    }
+
+    #[test]
+    fn test_calculate_organization_score_boundary_40() {
+        let score = calculate_organization_score(150, 12);
+        assert!(score >= 40.0 && score < 60.0);
+    }
+
+    #[test]
+    fn test_calculate_organization_score_penalty_increases() {
+        let score_10 = calculate_organization_score(100, 10);
+        let score_15 = calculate_organization_score(100, 15);
+        assert!(score_10 > score_15);
     }
 }
