@@ -1,6 +1,5 @@
 use std::fs;
 use std::path::Path;
-use std::collections::HashMap;
 use tempfile::TempDir;
 
 /// Helper function to create a test directory with sample files
@@ -114,6 +113,8 @@ fn test_score_interpretation_consistency() {
 
 #[test]
 fn test_extension_counting_accuracy() {
+    use std::collections::HashMap;
+    
     let extensions: HashMap<String, usize> = vec![
         ("pdf".to_string(), 10),
         ("png".to_string(), 5),
