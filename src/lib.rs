@@ -189,7 +189,7 @@ pub fn calculate_organization_score(file_count: usize, type_count: usize) -> f64
     let diversity_penalty = diversity_ratio * 20.0;
     score -= diversity_penalty;
 
-    score.max(0.0).min(100.0)
+    score.clamp(0.0, 100.0)
 }
 
 /// Interprets the organization score and returns a descriptive message.

@@ -42,7 +42,7 @@ fn display_extension_breakdown(analysis: &lesort::AnalysisResult) {
     let mut extensions: Vec<_> = analysis.extension_counts.iter().collect();
     extensions.sort_by_key(|&(_, count)| std::cmp::Reverse(*count));
 
-    for (ext, count) in extensions.iter().take(10) {
+    for &(ext, count) in extensions.iter().take(10) {
         let percentage = (*count as f64 / analysis.file_count as f64) * 100.0;
         println!("  {}: {} files ({:.1}%)", ext, count, percentage);
     }

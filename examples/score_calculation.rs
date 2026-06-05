@@ -85,8 +85,8 @@ fn display_detailed_example() {
     println!("Detailed Example: 100 files with 8 file types");
     println!();
 
-    let file_count = 100.0;
-    let type_count = 8.0;
+    let file_count = 100.0_f64;
+    let type_count = 8.0_f64;
     let file_penalty = (file_count / (1.0 + file_count)) * 30.0;
     let type_penalty = type_count.powi(2) * 0.3;
     let diversity_penalty = (type_count / file_count) * 20.0;

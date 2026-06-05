@@ -46,7 +46,6 @@
 //! ```
 
 use clap::Parser;
-use std::fs;
 use std::path::Path;
 use std::collections::HashMap;
 
@@ -131,7 +130,7 @@ fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bo
 fn print_results(
     file_count: usize,
     extension_counts: &HashMap<String, usize>,
-    files: &mut Vec<(String, String)>,
+    files: &mut [(String, String)],
     detail: bool,
     show_score: bool,
 ) {
@@ -173,7 +172,7 @@ fn print_extension_breakdown(file_count: usize, extension_counts: &HashMap<Strin
 /// Displays a detailed list of all files sorted alphabetically.
 ///
 /// Format: filename [extension]
-fn print_detailed_file_list(files: &mut Vec<(String, String)>) {
+fn print_detailed_file_list(files: &mut [(String, String)]) {
     println!("📝 Detailed File List:");
     files.sort();
 
