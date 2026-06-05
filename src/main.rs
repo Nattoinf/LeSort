@@ -1,3 +1,50 @@
+//! # LeSort - File Organization Analyzer
+//!
+//! LeSort is a command-line tool that analyzes file organization in a directory.
+//! It provides statistics about file types, calculates an organization score,
+//! and helps users understand the structure of their directories.
+//!
+//! ## Features
+//!
+//! - Analyze file distribution by extension
+//! - Calculate organization score based on file count and diversity
+//! - Display detailed file lists
+//! - Support for hidden files
+//! - Command-line interface with multiple options
+//!
+//! ## Usage
+//!
+//! ```text
+//! lesort [OPTIONS] [PATH]
+//!
+//! Arguments:
+//!   [PATH]  Target directory to analyze (default: current directory)
+//!
+//! Options:
+//!   -a, --all      Include hidden files in analysis
+//!   -d, --detail   Show detailed classification of files
+//!   -s, --score    Display organization score
+//!   -h, --help     Print help
+//!   -V, --version  Print version
+//! ```
+//!
+//! ## Examples
+//!
+//! Analyze current directory:
+//! ```text
+//! $ lesort
+//! ```
+//!
+//! Analyze with score and details:
+//! ```text
+//! $ lesort -s -d
+//! ```
+//!
+//! Analyze specific directory with all files:
+//! ```text
+//! $ lesort /path/to/dir -a
+//! ```
+
 use clap::Parser;
 use std::fs;
 use std::path::Path;
