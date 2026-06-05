@@ -16,21 +16,27 @@ fn main() {
     println!("Analyzing directory: {}", dir.display());
     println!();
 
-    // Analyze without hidden files
+    analyze_without_hidden(dir);
+    println!();
+    analyze_with_hidden(dir);
+}
+
+/// Analyze directory without hidden files
+fn analyze_without_hidden(dir: &Path) {
     match collect_files(dir, false) {
         Ok(analysis) => {
             println!("📊 Analysis WITHOUT hidden files:");
             println!("  Total files: {}", analysis.file_count);
             println!("  File types: {}", analysis.extension_counts.len());
-            println!();
         }
         Err(e) => {
             eprintln!("Error: {}", e);
-            return;
         }
     }
+}
 
-    // Analyze with hidden files
+/// Analyze directory with hidden files and display them
+fn analyze_with_hidden(dir: &Path) {
     match collect_files(dir, true) {
         Ok(analysis) => {
             println!("📊 Analysis WITH hidden files included:");
@@ -38,24 +44,28 @@ fn main() {
             println!("  File types: {}", analysis.extension_counts.len());
             println!();
 
-            // Show hidden files if any
-            let hidden_files: Vec<_> = analysis
-                .files
-                .iter()
-                .filter(|(name, _)| name.starts_with('.'))
-                .collect();
-
-            if !hidden_files.is_empty() {
-                println!("🔍 Hidden files found:");
-                for (name, ext) in hidden_files {
-                    println!("  {} [{}]", name, ext);
-                }
-            } else {
-                println!("🔍 No hidden files found in this directory");
-            }
+            display_hidden_files(&analysis);
         }
         Err(e) => {
             eprintln!("Error: {}", e);
         }
+    }
+}
+
+/// Display hidden files found in the directory
+fn display_hidden_files(analysis: &lesort::AnalysisResult) {
+    let hidden_files: Vec<_> = analysis
+        .files
+        .iter()
+        .filter(|(name, _)| name.starts_with('.'))
+        .collect();
+
+    if !hidden_files.is_empty() {
+        println!("🔍 Hidden files found:");
+        for (name, ext) in hidden_files {
+            println!("  {} [{}]", name, ext);
+        }
+    } else {
+        println!("🔍 No hidden files found in this directory");
     }
 }
