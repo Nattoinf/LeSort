@@ -1,3 +1,49 @@
+//! # LeSort Library - File Analysis Core
+//!
+//! This library provides the core functionality for LeSort, a file organization analyzer.
+//! It offers utilities for analyzing directory structures, calculating organization scores,
+//! and providing insights about file organization.
+//!
+//! ## Main Components
+//!
+//! - [`collect_files`]: Collects and analyzes files from a directory
+//! - [`calculate_organization_score`]: Computes an organization quality score
+//! - [`interpret_score`]: Converts numeric scores to human-readable feedback
+//! - [`get_extension`]: Extracts file extensions
+//! - [`is_hidden`]: Checks if files are hidden
+//!
+//! ## Organization Score
+//!
+//! The organization score is calculated based on three penalty factors:
+//!
+//! - **File count penalty**: Penalizes having too many files (max 30 points)
+//! - **Type penalty**: Penalizes excessive file type diversity (quadratic increase)
+//! - **Diversity penalty**: Penalizes unbalanced extension distribution (max 20 points)
+//!
+//! The score is calculated as:
+//! ```text
+//! score = 100 - file_penalty - type_penalty - diversity_penalty
+//! ```
+//!
+//! Score ranges:
+//! - 80-100%: Excellent organization ✅
+//! - 60-79%: Good organization 👍
+//! - 40-59%: Fair organization ⚠️
+//! - 0-39%: Poor organization ❌
+//!
+//! ## Example
+//!
+//! ```no_run
+//! use std::path::Path;
+//! use lesort::collect_files;
+//!
+//! let dir = Path::new(".");
+//! if let Ok(analysis) = collect_files(dir, false) {
+//!     println!("Total files: {}", analysis.file_count);
+//!     println!("File types: {}", analysis.extension_counts.len());
+//! }
+//! ```
+
 use std::fs;
 use std::path::Path;
 use std::collections::HashMap;
