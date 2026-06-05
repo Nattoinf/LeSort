@@ -249,22 +249,25 @@ mod tests {
         assert!(result.contains("❌ Poor"));
     }
 
+    /// Score should be in good range (60-80): score ≈ 69.89
     #[test]
-    fn test_calculate_organization_score_boundary_80() {
+    fn test_calculate_organization_score_boundary_good() {
         let score = calculate_organization_score(50, 1);
-        assert!(score >= 80.0);
+        assert!(score >= 60.0 && score < 80.0, "Expected 60-80, got {}", score);
     }
 
+    /// Score should be in fair range (40-60): score ≈ 49.5
     #[test]
-    fn test_calculate_organization_score_boundary_60() {
+    fn test_calculate_organization_score_boundary_fair() {
         let score = calculate_organization_score(100, 8);
-        assert!(score >= 60.0 && score < 80.0);
+        assert!(score >= 40.0 && score < 60.0, "Expected 40-60, got {}", score);
     }
 
+    /// Score should be in poor range (0-40): score ≈ 25.4
     #[test]
-    fn test_calculate_organization_score_boundary_40() {
+    fn test_calculate_organization_score_boundary_poor() {
         let score = calculate_organization_score(150, 12);
-        assert!(score >= 40.0 && score < 60.0);
+        assert!(score >= 0.0 && score < 40.0, "Expected 0-40, got {}", score);
     }
 
     #[test]

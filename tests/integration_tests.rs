@@ -1,5 +1,4 @@
 use std::fs;
-use std::path::Path;
 use tempfile::TempDir;
 
 /// Helper function to create a test directory with sample files
