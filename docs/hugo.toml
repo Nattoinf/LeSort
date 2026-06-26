@@ -1,0 +1,15 @@
+baseURL = 'https://nattoinf.github.io/LeSort/'
+locale = 'ja'
+title = 'LeSort'
+
+theme = 'PaperMod'
+
+[pagination]
+pagerSize = 10
+
+[params]
+description = "Directory analysis tool written in Rust"
+ShowReadingTime = true
+ShowBreadCrumbs = true
+ShowCodeCopyButtons = true
+ShowPostNavLinks = true
