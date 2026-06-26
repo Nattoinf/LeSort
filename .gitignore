@@ -4,3 +4,6 @@
 # Added by cargo
 
 /target
+
+docs/public/
+docs/.hugo_build.lock

@@ -49,6 +49,7 @@ use std::path::Path;
 use std::collections::HashMap;
 
 /// File analysis result structure
+#[derive(Debug)]
 pub struct AnalysisResult {
     pub file_count: usize,
     pub extension_counts: HashMap<String, usize>,
@@ -415,42 +416,42 @@ fn test_calculate_organization_score_excellent_boundary() {
 
 #[test]
 fn test_interpret_score_boundary_at_80() {
-    assert!(lesort::interpret_score(80.0).contains("✅ Excellent"));
+    assert!(crate::interpret_score(80.0).contains("✅ Excellent"));
 }
 
 #[test]
 fn test_interpret_score_boundary_just_below_80() {
-    assert!(lesort::interpret_score(79.9).contains("👍 Good"));
+    assert!(crate::interpret_score(79.9).contains("👍 Good"));
 }
 
 #[test]
 fn test_interpret_score_boundary_at_60() {
-    assert!(lesort::interpret_score(60.0).contains("👍 Good"));
+    assert!(crate::interpret_score(60.0).contains("👍 Good"));
 }
 
 #[test]
 fn test_interpret_score_boundary_just_below_60() {
-    assert!(lesort::interpret_score(59.9).contains("⚠️"));
+    assert!(crate::interpret_score(59.9).contains("⚠️"));
 }
 
 #[test]
 fn test_interpret_score_boundary_at_40() {
-    assert!(lesort::interpret_score(40.0).contains("⚠️"));
+    assert!(crate::interpret_score(40.0).contains("⚠️"));
 }
 
 #[test]
 fn test_interpret_score_boundary_just_below_40() {
-    assert!(lesort::interpret_score(39.9).contains("❌ Poor"));
+    assert!(crate::interpret_score(39.9).contains("❌ Poor"));
 }
 
 #[test]
 fn test_interpret_score_zero() {
-    assert!(lesort::interpret_score(0.0).contains("❌ Poor"));
+    assert!(crate::interpret_score(0.0).contains("❌ Poor"));
 }
 
 #[test]
 fn test_interpret_score_100() {
-    assert!(lesort::interpret_score(100.0).contains("✅ Excellent"));
+    assert!(crate::interpret_score(100.0).contains("✅ Excellent"));
 }
 
 // --- is_hidden の追加ケース ---
