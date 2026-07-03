@@ -34,8 +34,10 @@ fn display_scenario_analysis() {
 
     println!("Scenario Analysis:");
     println!();
-    println!("{:<25} {:>10} {:>5} {:>10} {:<30}", 
-             "Scenario", "Files", "Types", "Score", "Interpretation");
+    println!(
+        "{:<25} {:>10} {:>5} {:>10} {:<30}",
+        "Scenario", "Files", "Types", "Score", "Interpretation"
+    );
     println!("{}", "-".repeat(82));
 
     for (name, file_count, type_count) in scenarios {
@@ -43,15 +45,16 @@ fn display_scenario_analysis() {
         let interpretation = interpret_score(score);
         let clean = remove_emoji(&interpretation);
 
-        println!("{:<25} {:>10} {:>5} {:>9.2}% {}", 
-                 name, file_count, type_count, score, clean);
+        println!(
+            "{:<25} {:>10} {:>5} {:>9.2}% {}",
+            name, file_count, type_count, score, clean
+        );
     }
 }
 
 /// Remove emoji from interpretation string
 fn remove_emoji(text: &str) -> String {
-    text
-        .replace("✅", "")
+    text.replace("✅", "")
         .replace("👍", "")
         .replace("⚠️", "")
         .replace("❌", "")
@@ -96,7 +99,10 @@ fn display_detailed_example() {
     println!("  Type penalty:      {:.2}", type_penalty);
     println!("  Diversity penalty: {:.2}", diversity_penalty);
     println!("  ─────────────────────────────");
-    println!("  Total penalty:     {:.2}", file_penalty + type_penalty + diversity_penalty);
+    println!(
+        "  Total penalty:     {:.2}",
+        file_penalty + type_penalty + diversity_penalty
+    );
     println!("  Final score:       {:.2}%", score);
     println!("  Interpretation:    {}", interpret_score(score));
 }

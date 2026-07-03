@@ -49,11 +49,7 @@ fn test_collect_files_same_extension() {
 
 #[test]
 fn test_collect_files_without_extension() {
-    let test_dir = create_test_directory(vec![
-        ("README", ""),
-        ("Makefile", ""),
-        ("LICENSE", ""),
-    ]);
+    let test_dir = create_test_directory(vec![("README", ""), ("Makefile", ""), ("LICENSE", "")]);
 
     let result = lesort::collect_files(test_dir.path(), false);
     assert!(result.is_ok());
@@ -89,7 +85,7 @@ fn test_score_calculation_with_real_data() {
     let file_count = 50;
     let type_count = 3;
     let score = lesort::calculate_organization_score(file_count, type_count);
-    
+
     assert!(score >= 60.0 && score < 100.0);
     assert_eq!(lesort::interpret_score(score), "👍 Good organization.");
 }
@@ -105,15 +101,20 @@ fn test_score_interpretation_consistency() {
 
     for (score, expected) in test_cases {
         let result = lesort::interpret_score(score);
-        assert!(result.contains(expected), 
-                "Score {}: expected '{}', got '{}'", score, expected, result);
+        assert!(
+            result.contains(expected),
+            "Score {}: expected '{}', got '{}'",
+            score,
+            expected,
+            result
+        );
     }
 }
 
 #[test]
 fn test_extension_counting_accuracy() {
     use std::collections::HashMap;
-    
+
     let extensions: HashMap<String, usize> = vec![
         ("pdf".to_string(), 10),
         ("png".to_string(), 5),
@@ -127,13 +128,10 @@ fn test_extension_counting_accuracy() {
 }
 #[test]
 fn test_collect_files_all_flag_counts_hidden() {
-    let test_dir = create_test_directory(vec![
-        ("normal.txt", "txt"),
-        (".hidden", ""),
-    ]);
+    let test_dir = create_test_directory(vec![("normal.txt", "txt"), (".hidden", "")]);
     // .hidden ファイルを手動で作成（create_test_directory は name をそのまま使う）
     let result_without = lesort::collect_files(test_dir.path(), false).unwrap();
-    let result_with    = lesort::collect_files(test_dir.path(), true).unwrap();
+    let result_with = lesort::collect_files(test_dir.path(), true).unwrap();
 
     assert_eq!(result_without.file_count, 1);
     assert_eq!(result_with.file_count, 2);

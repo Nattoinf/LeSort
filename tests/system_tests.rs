@@ -49,14 +49,15 @@ fn test_system_analyze_realistic_directory() {
     assert!(result.is_ok());
 
     let analysis = result.unwrap();
-    
+
     assert_eq!(analysis.file_count, 13);
     assert!(analysis.extension_counts.len() >= 6);
-    
+
     assert_eq!(*analysis.extension_counts.get("pdf").unwrap(), 5);
     assert_eq!(*analysis.extension_counts.get("png").unwrap(), 3);
 
-    let score = lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
+    let score =
+        lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
     assert!(score >= 0.0 && score <= 100.0);
 }
 
@@ -67,8 +68,9 @@ fn test_system_score_realistic_data() {
     let result = lesort::collect_files(test_dir.path(), false);
     let analysis = result.unwrap();
 
-    let score = lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
-    
+    let score =
+        lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
+
     assert!(score < 80.0);
     let interpretation = lesort::interpret_score(score);
     assert!(!interpretation.is_empty());
@@ -90,7 +92,7 @@ fn test_system_large_directory_simulation() {
     let dir = TempDir::new().unwrap();
 
     let extensions = vec!["pdf", "doc", "xls", "ppt", "zip", "txt"];
-    
+
     for i in 0..100 {
         let ext = extensions[i % extensions.len()];
         let file_name = format!("file{}.{}", i, ext);
@@ -104,7 +106,8 @@ fn test_system_large_directory_simulation() {
     assert_eq!(analysis.file_count, 100);
     assert_eq!(analysis.extension_counts.len(), 6);
 
-    let score = lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
+    let score =
+        lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
     assert!(score >= 0.0 && score <= 100.0);
 }
 
@@ -150,14 +153,16 @@ fn test_system_end_to_end_quality_assessment() {
     assert!(analysis.file_count > 0);
     assert!(analysis.extension_counts.len() > 0);
 
-    let score = lesort::calculate_organization_score(
-        analysis.file_count,
-        analysis.extension_counts.len(),
-    );
+    let score =
+        lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
 
     let interpretation = lesort::interpret_score(score);
-    
+
     assert!(!interpretation.is_empty());
-    assert!(interpretation.contains("✅") || interpretation.contains("👍") || 
-            interpretation.contains("⚠️") || interpretation.contains("❌"));
+    assert!(
+        interpretation.contains("✅")
+            || interpretation.contains("👍")
+            || interpretation.contains("⚠️")
+            || interpretation.contains("❌")
+    );
 }

@@ -16,7 +16,7 @@
 - It evaluates files based on their extensions and naming patterns, then calculates an organization score.
 - The goal is to help users keep their directories clean and well organized.
 
-Features
+# Features
 - 📁 Analyze directory contents
 - 📊 Count file extensions
 - 📂 Include hidden files (--all)
@@ -44,6 +44,28 @@ target/release/lesort
 - **You can also install it locally with**
 
 cargo install --path .
+
+## Development
+
+LeSort uses **just** to simplify common development tasks.
+
+### Install just
+
+```bash
+brew install just
+```
+
+### Common Commands
+
+```bash
+just build          # Build the project
+just test           # Run all tests
+just fmt            # Format source code
+just clippy         # Run Clippy
+just coverage       # Generate coverage report
+just docker-build   # Build Docker image
+just docker-run     # Run LeSort in Docker
+```
 
 # Usage
 

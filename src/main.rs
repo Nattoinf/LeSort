@@ -46,8 +46,8 @@
 //! ```
 
 use clap::Parser;
-use std::path::Path;
 use std::collections::HashMap;
+use std::path::Path;
 
 /// File organization analyzer and scoring tool
 #[derive(Parser, Debug)]
@@ -85,7 +85,7 @@ fn main() {
     let path = args.path.unwrap_or_else(|| ".".to_string());
 
     match analyze_directory(&path, args.all, args.detail, args.score) {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => eprintln!("Error: {}", e),
     }
 }
@@ -97,7 +97,12 @@ fn main() {
 /// * `include_all` - Whether to include hidden files
 /// * `detail` - Whether to show detailed file list
 /// * `show_score` - Whether to display organization score
-fn analyze_directory(path: &str, include_all: bool, detail: bool, show_score: bool) -> Result<(), String> {
+fn analyze_directory(
+    path: &str,
+    include_all: bool,
+    detail: bool,
+    show_score: bool,
+) -> Result<(), String> {
     let dir_path = Path::new(path);
 
     if !dir_path.exists() {
@@ -190,10 +195,7 @@ fn print_detailed_file_list(files: &mut [(String, String)]) {
 /// 2. Extension type penalty (quadratic increase)
 /// 3. Diversity penalty (max 20 points)
 fn print_organization_score(file_count: usize, extension_counts: &HashMap<String, usize>) {
-    let score = lesort::calculate_organization_score(
-        file_count,
-        extension_counts.len(),
-    );
+    let score = lesort::calculate_organization_score(file_count, extension_counts.len());
 
     println!("📈 Organization Score: {:.2}%", score);
     println!("{}", lesort::interpret_score(score));
@@ -288,14 +290,22 @@ mod tests {
     #[test]
     fn test_calculate_organization_score_boundary_good() {
         let score = lesort::calculate_organization_score(50, 1);
-        assert!(score >= 60.0 && score < 80.0, "Expected 60-80, got {}", score);
+        assert!(
+            score >= 60.0 && score < 80.0,
+            "Expected 60-80, got {}",
+            score
+        );
     }
 
     /// Score should be in fair range (40-60): score ≈ 49.5
     #[test]
     fn test_calculate_organization_score_boundary_fair() {
         let score = lesort::calculate_organization_score(100, 8);
-        assert!(score >= 40.0 && score < 60.0, "Expected 40-60, got {}", score);
+        assert!(
+            score >= 40.0 && score < 60.0,
+            "Expected 40-60, got {}",
+            score
+        );
     }
 
     /// Score should be in poor range (0-40): score ≈ 25.4

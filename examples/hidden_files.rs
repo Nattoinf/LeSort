@@ -5,8 +5,8 @@
 //!
 //! Run with: `cargo run --example hidden_files`
 
-use std::path::Path;
 use lesort::collect_files;
+use std::path::Path;
 
 fn main() {
     println!("=== LeSort Hidden Files Example ===");

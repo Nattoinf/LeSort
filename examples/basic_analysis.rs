@@ -5,8 +5,8 @@
 //!
 //! Run with: `cargo run --example basic_analysis`
 
-use std::path::Path;
 use lesort::collect_files;
+use std::path::Path;
 
 fn main() {
     println!("=== LeSort Basic Analysis Example ===");
@@ -51,10 +51,8 @@ fn display_extension_breakdown(analysis: &lesort::AnalysisResult) {
 
 /// Calculate and display organization score
 fn display_organization_score(analysis: &lesort::AnalysisResult) {
-    let score = lesort::calculate_organization_score(
-        analysis.file_count,
-        analysis.extension_counts.len(),
-    );
+    let score =
+        lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
     println!("📈 Organization Score: {:.2}%", score);
     println!("   {}", lesort::interpret_score(score));
 }

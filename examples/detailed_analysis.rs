@@ -6,9 +6,9 @@
 //! Run with: `cargo run --example detailed_analysis -- <directory>`
 //! Or: `cargo run --example detailed_analysis` (uses current directory)
 
+use lesort::collect_files;
 use std::env;
 use std::path::Path;
-use lesort::collect_files;
 
 fn main() {
     println!("=== LeSort Detailed Analysis Example ===");
@@ -39,9 +39,7 @@ fn main() {
 
 /// Parse command line arguments or return default directory
 fn parse_arguments() -> String {
-    env::args()
-        .nth(1)
-        .unwrap_or_else(|| ".".to_string())
+    env::args().nth(1).unwrap_or_else(|| ".".to_string())
 }
 
 /// Validate that the path is a valid directory
@@ -94,10 +92,8 @@ fn display_extension_summary(analysis: &lesort::AnalysisResult) {
 
 /// Calculate and display organization score
 fn display_organization_score(analysis: &lesort::AnalysisResult) {
-    let score = lesort::calculate_organization_score(
-        analysis.file_count,
-        analysis.extension_counts.len(),
-    );
+    let score =
+        lesort::calculate_organization_score(analysis.file_count, analysis.extension_counts.len());
     println!("📈 Organization Score: {:.2}%", score);
     println!("   {}", lesort::interpret_score(score));
 }
