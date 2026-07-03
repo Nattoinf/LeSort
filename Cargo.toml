@@ -17,7 +17,3 @@ path = "src/main.rs"
 [lib]
 name = "lesort"
 path = "src/lib.rs"
-
-[arg(long, help="generate completion files",
- default_value_t = false)]
-pub completions: bool,
