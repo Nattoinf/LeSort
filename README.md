@@ -9,12 +9,41 @@
 ![Build Status](https://github.com/Nattoinf/LeSort/actions/workflows/build.yaml/badge.svg)
 
 
-- Unixのlsコマンドを再実装したCLIツール
+- A CLI tool that reimplements the Unix `ls` command
 
 # Overview
-- フォルダ内のファイル一覧を解析し、拡張子や命名規則に基づいて分類の妥当性を評価するツール
-- ファイルの種類や命名パターンから、整理状態が適切かどうかをスコアとして可視化する
-- ディレクトリ構成の改善や整理の指針を提供することを目的とする
+- LeSort is a lightweight CLI tool that analyzes directory organization.
+- It evaluates files based on their extensions and naming patterns, then calculates an organization score.
+- The goal is to help users keep their directories clean and well organized.
+
+Features
+- 📁 Analyze directory contents
+- 📊 Count file extensions
+- 📂 Include hidden files (--all)
+- 📋 Show detailed file information (--detail)
+- 📈 Calculate an organization score (--score)
+- ⚡ Fast and lightweight CLI application
+- 🦀 Written in Rust
+
+# Installation
+Build from source
+
+- **Clone the repository**
+
+git clone https://github.com/Nattoinf/LeSort.git
+cd LeSort
+
+- **Build the project**
+
+cargo build --release
+
+- **The executable will be generated at**
+
+target/release/lesort
+
+- **You can also install it locally with**
+
+cargo install --path .
 
 # Usage
 
@@ -46,120 +75,143 @@ Description:
 LeSort analyzes files in a directory based on their extensions and naming patterns.
 It evaluates whether the directory structure is well-organized and outputs a score.
 
-Examples:
+## Examples
+
+- **Analyze the current directory**
+
 lesort
+
+- **Analyze another directory**
+
 lesort ./src
-lesort -a -s
+
+- **Include hidden files**
+
+lesort -a
+
+- **Display the organization score**
+
+lesort -s
+
+- **Display detailed file information**
+
+lesort -d
+
+- **Combine multiple options**
+
+lesort -a -d -s
 
 # Scoring Algorithm
 
-LeSortは、ディレクトリの整理状態を**3段階の減点システム**によって評価します。
+LeSort evaluates directory organization using a three-stage penalty system.
 
-## スコア計算方式
+The score starts at 100 points, and penalties are applied based on directory complexity.
 
-基本スコア: **100点**から開始
+Final Score =
+100
+- File Count Penalty
+- File Type Penalty
+- Diversity Penalty
+## 1. File Count Penalty
 
-```
-最終スコア = 100 - ファイル数減点 - 拡張子種類減点 - 多様性減点
-```
+Directories containing more files become increasingly difficult to manage.
 
-### 1. ファイル数による減点（最大30点）
+file_penalty =
+(file_count / (1 + file_count)) × 30
 
-ファイル数が多いほど、ディレクトリが複雑になるため減点が増えます。
-ロジスティック関数でスムーズに減衰：
+**Characteristics**
 
-```
-file_penalty = (file_count / (1 + file_count)) × 30
-```
+- Maximum penalty: 30 points
+- Smoothly converges as the number of files increases
+## 2. File Type Penalty
 
-- ファイル数が少ないほど減点が少ない
-- ファイル数が増えても最大30点に収束
+Having many different file types generally indicates that unrelated files are mixed together.
 
-### 2. 拡張子の種類による減点（加速的に増加）
+type_penalty =
+(type_count)² × 0.3
 
-拡張子の種類が増えるたびに、減点の重みが**増大**します。
-二次関数を使用：
+Example penalties:
 
-```
-type_penalty = (type_count)² × 0.3
-```
+|File Types| Penalty |
+|----------|---------|
+|     1    |   0.3  |
+|     5    |   7.5  |
+|    10    |  30.0  |
+|    14    |  58.8  |
+## 3. Diversity Penalty
 
-**例：**
-- 1種類：0.3点
-- 5種類：7.5点
-- 10種類：30点
-- 14種類：58.8点
+This penalty considers the ratio between the number of file types and the total number of files.
 
-### 3. ファイル多様性による減点（最大20点）
+**diversity_penalty =**
+**(type_count / file_count) × 20**
 
-ファイル数に対する拡張子の種類の比率。
-理想的には1ファイルあたり1種類未満：
+Directories containing many different file types relative to the total number of files receive a larger penalty.
 
-```
-diversity_penalty = (type_count / file_count) × 20
-```
+## Score Interpretation
+| Score | Evaluation |
+|------:|------------|
+| 80–100 | ✅ Excellent organization |
+| 60–79  | 👍 Good organization |
+| 40–59  | ⚠️ Fair organization |
+| 0–39   | ❌ Poor organization |
 
-## スコア評価基準
+## Example Calculations
+Example 1
+Files: 50
+File types: 1
+File penalty      = 29.41
+Type penalty      = 0.30
+Diversity penalty = 0.40
 
-| スコア | 評価 | 状態 |
-|--------|------|------|
-| 80% - 100% | ✅ Excellent organization! | 非常に良好 |
-| 60% - 79% | 👍 Good organization. | 良好 |
-| 40% - 59% | ⚠️ Fair organization. Could be improved. | 改善推奨 |
-| 0% - 39% | ❌ Poor organization. Consider reorganizing. | 要再整理 |
+Final score = 69.89%
 
-## 計算例
+- Result
 
-### 例1：整理された小規模ディレクトリ
-- ファイル数: 50
-- 拡張子種類: 1
+👍 Good organization
+Example 2
+Files: 100
+File types: 10
+File penalty      = 29.70
+Type penalty      = 30.00
+Diversity penalty = 2.00
 
-計算：
-```
-- ファイル数減点: (50 / 51) × 30 = 29.41点
-- 拡張子種類減点: 1² × 0.3 = 0.3点
-- 多様性減点: (1 / 50) × 20 = 0.4点
+Final score = 38.30%
 
-スコア = 100 - 29.41 - 0.3 - 0.4 = 69.89%
-→ 👍 Good organization.
-```
+- Result
 
-### 例2：やや雑然としたディレクトリ
-- ファイル数: 100
-- 拡張子種類: 10
+❌ Poor organization
+Example 3
+Files: 213
+File types: 14
+File penalty      = 29.86
+Type penalty      = 58.80
+Diversity penalty = 1.31
 
-計算：
-```
-- ファイル数減点: (100 / 101) × 30 = 29.70点
-- 拡張子種類減点: 10² × 0.3 = 30点
-- 多様性減点: (10 / 100) × 20 = 2点
+Final score = 10.03%
 
-スコア = 100 - 29.70 - 30 - 2 = 38.30%
-→ ❌ Poor organization. Consider reorganizing.
-```
+Result:
 
-### 例3：非常に雑然としたディレクトリ
-- ファイル数: 213
-- 拡張子種類: 14
+❌ Poor organization
 
-計算：
-```
-- ファイル数減点: (213 / 214) × 30 = 29.86点
-- 拡張子種類減点: 14² × 0.3 = 58.8点
-- 多様性減点: (14 / 213) × 20 = 1.31点
 
-スコア = 100 - 29.86 - 58.8 - 1.31 = 10.03%
-→ ❌ Poor organization. Consider reorganizing.
-```
+# Testing
 
-# Installation
+- **Run all tests**
 
-# Lisence
-- MIT Lisense
+cargo test
+
+- **Generate a coverage report**
+
+cargo llvm-cov --html
+
+- **Run Clippy**
+
+cargo clippy -- -D warnings
+
+# License
+- MIT License
 
 # Author
-- Naito Shun
-
-# About
+- Shun Naito
 
 
