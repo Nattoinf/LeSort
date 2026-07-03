@@ -1,0 +1,43 @@
+#compdef lesort
+
+autoload -U is-at-least
+
+_lesort() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" : \
+'-a[Include hidden files in analysis]' \
+'--all[Include hidden files in analysis]' \
+'-d[Show detailed classification of files]' \
+'--detail[Show detailed classification of files]' \
+'-s[Display organization score]' \
+'--score[Display organization score]' \
+'--completions[Generate completion files]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+'::path -- Target directory to analyze (default\: current directory):_default' \
+&& ret=0
+}
+
+(( $+functions[_lesort_commands] )) ||
+_lesort_commands() {
+    local commands; commands=()
+    _describe -t commands 'lesort commands' commands "$@"
+}
+
+if [ "$funcstack[1]" = "_lesort" ]; then
+    _lesort "$@"
+else
+    compdef _lesort lesort
+fi

@@ -49,12 +49,14 @@ use clap::Parser;
 use std::collections::HashMap;
 use std::path::Path;
 
+mod gencomp;
+
 /// File organization analyzer and scoring tool
 #[derive(Parser, Debug)]
 #[command(name = "lesort")]
 #[command(version = "0.1.0")]
 #[command(about = "Analyzes files in a directory based on their extensions and naming patterns", long_about = None)]
-struct Args {
+pub struct Args {
     /// Target directory to analyze (default: current directory)
     #[arg(value_name = "PATH")]
     path: Option<String>,
@@ -70,6 +72,14 @@ struct Args {
     /// Display organization score
     #[arg(short, long)]
     score: bool,
+
+    /// Generate completion files
+    #[arg(
+        long,
+        help = "Generate completion files",
+        default_value_t = false
+    )]
+    completions: bool,
 }
 
 /// File analysis result structure
@@ -81,6 +91,10 @@ pub struct AnalysisResult {
 
 fn main() {
     let args = Args::parse();
+    if args.completions {
+        gencomp::generate(std::path::Path::new("completions"));
+        return;
+    }   
 
     let path = args.path.unwrap_or_else(|| ".".to_string());
 

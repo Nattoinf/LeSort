@@ -1,0 +1,35 @@
+
+use builtin;
+use str;
+
+set edit:completion:arg-completer[lesort] = {|@words|
+    fn spaces {|n|
+        builtin:repeat $n ' ' | str:join ''
+    }
+    fn cand {|text desc|
+        edit:complex-candidate $text &display=$text' '(spaces (- 14 (wcswidth $text)))$desc
+    }
+    var command = 'lesort'
+    for word $words[1..-1] {
+        if (str:has-prefix $word '-') {
+            break
+        }
+        set command = $command';'$word
+    }
+    var completions = [
+        &'lesort'= {
+            cand -a 'Include hidden files in analysis'
+            cand --all 'Include hidden files in analysis'
+            cand -d 'Show detailed classification of files'
+            cand --detail 'Show detailed classification of files'
+            cand -s 'Display organization score'
+            cand --score 'Display organization score'
+            cand --completions 'Generate completion files'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+    ]
+    $completions[$command]
+}

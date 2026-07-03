@@ -1,0 +1,6 @@
+complete -c lesort -s a -l all -d 'Include hidden files in analysis'
+complete -c lesort -s d -l detail -d 'Show detailed classification of files'
+complete -c lesort -s s -l score -d 'Display organization score'
+complete -c lesort -l completions -d 'Generate completion files'
+complete -c lesort -s h -l help -d 'Print help'
+complete -c lesort -s V -l version -d 'Print version'
