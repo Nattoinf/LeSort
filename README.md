@@ -45,6 +45,12 @@ target/release/lesort
 
 cargo install --path .
 
+## Homebrew
+
+```bash
+brew tap Nattoinf/lesort
+brew install lesort
+
 ## Development
 
 LeSort uses **just** to simplify common development tasks.
