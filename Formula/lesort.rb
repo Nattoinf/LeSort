@@ -1,7 +1,7 @@
 class Lesort < Formula
   desc "File organization analyzer and scoring tool"
   homepage "https://github.com/Nattoinf/LeSort"
-  url "https://github.com/Nattoinf/LeSort/archive/refs/tags/v0.1.0.tar.gz"
+  url "https://github.com/Nattoinf/LeSort/archive/refs/tags/v0.1.1.tar.gz"
   license "MIT"
 
   depends_on "rust" => :build
